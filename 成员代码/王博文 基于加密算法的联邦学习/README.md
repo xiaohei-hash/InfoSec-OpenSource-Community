@@ -25,15 +25,16 @@
 
 ## 文件结构
 
-  federated_encryption_demo.py   # 主程序代码
+  federated_encryption_demo.py   # 主程序代码  
   README.md                      # 本说明文档
 ## 环境依赖
-  基础库
-  Python 3.8+
-  PyTorch >= 1.9
-  torchvision
-  numpy
-  cryptography
+  基础库  
+  Python 3.8+  
+  PyTorch >= 1.9  
+  torchvision  
+  numpy  
+  cryptography  
+  
 安装命令示例：
  pip install torch torchvision numpy cryptography
 
