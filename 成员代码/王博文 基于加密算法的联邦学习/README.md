@@ -20,11 +20,11 @@
 自动对比明文训练（普通 SGD）与上述加密联邦学习的准确率及训练耗时。
 输出清晰的实验汇总表格。
 
-文件结构
+## 文件结构
 
   federated_encryption_demo.py   # 主程序代码
   README.md                      # 本说明文档
-环境依赖
+## 环境依赖
   基础库
   Python 3.8+
   PyTorch >= 1.9
@@ -35,7 +35,7 @@
  pip install torch torchvision numpy cryptography
 
 pip install tenseal
-使用方法
+## 使用方法
 
 直接运行脚本即可执行默认实验（线性分类器，3 轮联邦学习，3 个客户端，每客户端 5 个 batch）：
 python federated_encryption_demo.py
