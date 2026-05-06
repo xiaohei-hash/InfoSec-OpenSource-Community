@@ -41,11 +41,11 @@
 pip install tenseal
 ## 使用方法
 
-直接运行脚本即可执行默认实验（线性分类器，3 轮联邦学习，3 个客户端，每客户端 5 个 batch）：
-python federated_encryption_demo.py
-程序将自动下载 MNIST 数据集到 ./data 目录，依次进行：
-1.明文训练（总 batch 数 = 轮数 × 客户端数 × 每客户端 batch 数）
-2.对称加密联邦学习
-3.非对称加密联邦学习
-4.差分隐私联邦学习
-5.（如果 TenSEAL 可用）同态加密联邦学习
+直接运行脚本即可执行默认实验（线性分类器，3 轮联邦学习，3 个客户端，每客户端 5 个 batch）：  
+python federated_encryption_demo.py  
+程序将自动下载 MNIST 数据集到 ./data 目录，依次进行：  
+1.明文训练（总 batch 数 = 轮数 × 客户端数 × 每客户端 batch 数）  
+2.对称加密联邦学习  
+3.非对称加密联邦学习  
+4.差分隐私联邦学习  
+5.（如果 TenSEAL 可用）同态加密联邦学习  
