@@ -126,8 +126,6 @@ def fetch_datasets(full_dataset, trainset, ratio):
         for img in data[:num_poison_train_inputs]:
             # 对投毒样本添加标签
             target = random.randint(0,9)  # i 是当前样本的原始标签
-            #修改投毒策略：将标签修改为该标签的下一位数字（0→1，9→0）
-            #target = (i + 1) % 10   # i 是当前循环的类别索引，即原始标签
             poison_img = img
             poison_img = torch.from_numpy(np.array(poison_img) / 255.0)
             poison_trainset.append((poison_img, target))
@@ -179,11 +177,9 @@ loss_fn = torch.nn.CrossEntropyLoss().to(device)
 
 #每次的准确率
 clean_acc_list = []
-#每次的损失率
-loss_list = []
 
 # 使用带有动量的Adam优化器对模型优化
-optimizer = torch.optim.Adam(net.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
 epoch = 20
 clean_correct = 0 # 记录投毒后模型准确率
 
@@ -214,9 +210,6 @@ for epoch in range(epoch):
 
         running_loss += loss.item()
 
-    # 计算平均损失并记录
-    avg_loss = running_loss / len(trainset_dataloader)
-    loss_list.append(avg_loss)
 
     #输出每一轮loss值
     print("Epoch: {}, loss: {}".format(epoch + 1, running_loss))
@@ -238,11 +231,11 @@ for epoch in range(epoch):
     clean_acc_list.append(clean_acc)
     print("干净样本准确率为: " + str(clean_acc) + '%\n')
 
+    # 展示错误分类的图片
+    plot_misclassified_images(net, clean_testset, device)
+    # 展示正确分类的图片
+    plot_correctly_classified_images(net, clean_testset, device, num_images=10)
 
-# 展示错误分类的图片
-plot_misclassified_images(net, clean_testset, device)
-# 展示正确分类的图片
-plot_correctly_classified_images(net, clean_testset, device, num_images=10)
 # 关闭文件
 file.close()
 
@@ -254,17 +247,8 @@ plt.rcParams['font.size'] = 16
 # 准确率曲线
 plt.figure(figsize=(8, 6))
 plt.plot(range(1, len(clean_acc_list) + 1), clean_acc_list, marker='o', linestyle='-', color='b')
-plt.title("true date")
+plt.title("Clean Test Accuracy")  #"true date" 改为 "Clean Test Accuracy" 更清晰
 plt.xlabel("Epoch")
 plt.ylabel("Accuracy (%)")
-plt.grid(True)
-plt.show()
-
-# 绘制损失曲线 
-plt.figure(figsize=(8, 6))
-plt.plot(range(1, len(loss_list) + 1), loss_list, marker='s', linestyle='-', color='r')
-plt.title("Training Loss (Average per Epoch)")
-plt.xlabel("Epoch")
-plt.ylabel("Loss")
 plt.grid(True)
 plt.show()
