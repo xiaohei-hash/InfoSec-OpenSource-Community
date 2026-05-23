@@ -19,7 +19,18 @@ plt.rcParams['axes.unicode_minus'] = False
 # 设置随机种子保证可复现
 np.random.seed(42)
 tf.random.set_seed(42)
-
+```python
+# 实验配置常量（避免魔法数字）
+VALIDATION_SPLIT = 0.1
+DEFAULT_EPOCHS = 20
+DEFAULT_BATCH_SIZE = 64
+DEFAULT_LEARNING_RATE = 0.001
+DEFAULT_DROPOUT_RATE = 0.5
+NUM_ERROR_SAMPLES = 16
+EARLY_STOPPING_PATIENCE = 3
+LR_REDUCTION_FACTOR = 0.5
+LR_REDUCTION_PATIENCE = 2
+MIN_LEARNING_RATE = 1e-6
 
 def check_environment():
     """阶段1：环境验证"""
@@ -41,12 +52,6 @@ def check_environment():
 
     print("=" * 60)
     return len(gpus) > 0
-
-
-
-
-
-
 
 
 def load_and_preprocess_data(dataset_name='mnist'):
@@ -96,7 +101,7 @@ def load_and_preprocess_data(dataset_name='mnist'):
         raise ValueError("不支持的数据集，请选择'mnist'或'cifar10'")
 
     # 划分验证集（从训练集分出10%）
-    val_split = 0.1
+    val_split = VALIDATION_SPLIT
     val_size = int(len(x_train) * val_split)
 
     x_val = x_train[:val_size]
@@ -110,13 +115,6 @@ def load_and_preprocess_data(dataset_name='mnist'):
     print(f"类别数: {num_classes}")
 
     return (x_train, y_train), (x_val, y_val), (x_test, y_test), input_shape, num_classes, class_names
-
-
-
-
-
-
-
 
 def create_cnn_model(input_shape, num_classes, use_dropout=True, dropout_rate=0.5):
     """阶段3：CNN模型搭建"""
@@ -157,7 +155,6 @@ def create_cnn_model(input_shape, num_classes, use_dropout=True, dropout_rate=0.
 
     return model
 
-
 def compile_model(model, learning_rate=0.001):
     """编译模型"""
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
@@ -170,13 +167,7 @@ def compile_model(model, learning_rate=0.001):
 
     print(f"\n模型编译完成，学习率: {learning_rate}")
     return model
-
-
-
-
-
-
-
+    
 def train_model(model, x_train, y_train, x_val, y_val, epochs=20, batch_size=64):
     """阶段4：模型训练与调优"""
     print("\n" + "=" * 60)
@@ -188,17 +179,16 @@ def train_model(model, x_train, y_train, x_val, y_val, epochs=20, batch_size=64)
         # 早停：验证损失3轮不下降则停止
         callbacks.EarlyStopping(
             monitor='val_loss',
-            patience=3,
+            patience=EARLY_STOPPING_PATIENCE,
             restore_best_weights=True,
             verbose=1
         ),
 
-        # 学习率衰减
         callbacks.ReduceLROnPlateau(
             monitor='val_loss',
-            factor=0.5,
-            patience=2,
-            min_lr=1e-6,
+            factor=LR_REDUCTION_FACTOR,
+            patience=LR_REDUCTION_PATIENCE,
+            min_lr=MIN_LEARNING_RATE,
             verbose=1
         ),
 
@@ -251,12 +241,6 @@ def plot_training_history(history, save_path='training_history.png'):
     print(f"\n训练曲线已保存: {save_path}")
     plt.show()
 
-
-
-
-
-
-
 def evaluate_model(model, x_test, y_test, class_names, dataset_name):
     """阶段5：性能评估与改进"""
     print("\n" + "=" * 60)
@@ -306,7 +290,7 @@ def plot_confusion_matrix(y_true, y_pred, class_names, dataset_name):
     plt.show()
 
 
-def visualize_errors(model, x_test, y_test, class_names, dataset_name, num_errors=16):
+def visualize_errors(model, x_test, y_test, class_names, dataset_name, num_errors=NUM_ERROR_SAMPLES):
     """可视化分类错误的样本"""
     predictions = model.predict(x_test, verbose=0)
     y_pred = np.argmax(predictions, axis=1)
@@ -407,10 +391,9 @@ def main():
     # 选择数据集: 'mnist' 或 'cifar10'
     DATASET = 'mnist'  # 修改为'cifar10'可运行进阶实验
 
-    # 超参数设置
-    EPOCHS = 20
-    BATCH_SIZE = 64
-    LEARNING_RATE = 0.001
+    EPOCHS = DEFAULT_EPOCHS
+    BATCH_SIZE = DEFAULT_BATCH_SIZE
+    LEARNING_RATE = DEFAULT_LEARNING_RATE
 
     print("""
     ============================================
@@ -426,7 +409,7 @@ def main():
         input_shape, num_classes, class_names = load_and_preprocess_data(DATASET)
 
     # 阶段3：模型构建
-    model = create_cnn_model(input_shape, num_classes, use_dropout=True, dropout_rate=0.5)
+    model = create_cnn_model(input_shape, num_classes, use_dropout=True, dropout_rate=DEFAULT_DROPOUT_RATE)
     model = compile_model(model, learning_rate=LEARNING_RATE)
 
     # 阶段4：模型训练
